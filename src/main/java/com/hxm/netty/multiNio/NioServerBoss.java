@@ -30,8 +30,10 @@ public class NioServerBoss extends AbstractNioSelector implements Boss {
 	protected void process(Selector selector) throws IOException {
 		Set<SelectionKey> selectedKeys = selector.selectedKeys();
         if (selectedKeys.isEmpty()) {
+			System.out.println("boss不process");
             return;
         }
+		System.out.println("boss--process");
         
         for (Iterator<SelectionKey> i = selectedKeys.iterator(); i.hasNext();) {
             SelectionKey key = i.next();
@@ -50,7 +52,7 @@ public class NioServerBoss extends AbstractNioSelector implements Boss {
         }
 	}
 	
-	
+	//boss先在队列里等待注册OP_ACCEPT
 	public void registerAcceptChannelTask(final ServerSocketChannel serverChannel){
 		 final Selector selector = this.selector;
 		 registerTask(new Runnable() {
@@ -59,6 +61,7 @@ public class NioServerBoss extends AbstractNioSelector implements Boss {
 				try {
 					//注册serverChannel到selector
 					serverChannel.register(selector, SelectionKey.OP_ACCEPT);
+					System.out.println("accept注册完成");
 				} catch (ClosedChannelException e) {
 					e.printStackTrace();
 				}
@@ -68,6 +71,10 @@ public class NioServerBoss extends AbstractNioSelector implements Boss {
 	
 	@Override
 	protected int select(Selector selector) throws IOException {
+//		int k =selector.select();
+//		System.out.println(k);
+//		return k;
+		//永久阻塞
 		return selector.select();
 	}
 

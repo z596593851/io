@@ -63,9 +63,11 @@ public abstract class AbstractNioSelector implements Runnable {
 		} catch (IOException e) {
 			throw new RuntimeException("Failed to create a selector.");
 		}
+		//
 		executor.execute(this);
 	}
 
+	//所有boss/woker放入线程池
 	@Override
 	public void run() {
 		
@@ -75,8 +77,10 @@ public abstract class AbstractNioSelector implements Runnable {
 			try {
 				wakenUp.set(false);
 
+				//
 				select(selector);
 
+				//
 				processTaskQueue();
 
 				process(selector);
@@ -113,8 +117,10 @@ public abstract class AbstractNioSelector implements Runnable {
 		for (;;) {
 			final Runnable task = taskQueue.poll();
 			if (task == null) {
+//				System.out.println("null");
 				break;
 			}
+//			System.out.println("not null");
 			task.run();
 		}
 	}

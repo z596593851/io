@@ -39,6 +39,7 @@ public class NoBlockServer {
                 SelectionKey selectionKey = iterator.next();
 
                 // 接收事件就绪
+                //客户端先连接，给了read权限，然后再发送数据时服务器就可以读到了
                 if (selectionKey.isValid()&&selectionKey.isAcceptable()) {
 
                     // 8. 获取客户端的链接

@@ -28,8 +28,10 @@ public class NioServerWorker extends AbstractNioSelector implements Worker {
 	protected void process(Selector selector) throws IOException {
 		Set<SelectionKey> selectedKeys = selector.selectedKeys();
         if (selectedKeys.isEmpty()) {
+			System.out.println("worker不process");
             return;
         }
+		System.out.println("worker--process");
         Iterator<SelectionKey> ite = this.selector.selectedKeys().iterator();
 		while (ite.hasNext()) {
 			SelectionKey key = (SelectionKey) ite.next();
@@ -67,6 +69,7 @@ public class NioServerWorker extends AbstractNioSelector implements Worker {
 	/**
 	 * 加入一个新的socket客户端
 	 */
+	//worker在队列里注册OP_READ
 	public void registerNewChannelTask(final SocketChannel channel){
 		 final Selector selector = this.selector;
 		 registerTask(new Runnable() {
@@ -75,6 +78,7 @@ public class NioServerWorker extends AbstractNioSelector implements Worker {
 				try {
 					//将客户端注册到selector中
 					channel.register(selector, SelectionKey.OP_READ);
+					System.out.println("read注册完成");
 				} catch (ClosedChannelException e) {
 					e.printStackTrace();
 				}
@@ -84,7 +88,11 @@ public class NioServerWorker extends AbstractNioSelector implements Worker {
 
 	@Override
 	protected int select(Selector selector) throws IOException {
-		return selector.select(500);
+//		int k =selector.select(500);
+//		System.out.println(k);
+//		return k;
+		//轮询阻塞
+		return selector.select();
 	}
 	
 }
