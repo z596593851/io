@@ -57,7 +57,7 @@ public class NioServerWorker extends AbstractNioSelector implements Worker {
 				key.cancel();
 				System.out.println("客户端断开连接");
 	        }else{
-	        	 System.out.println("收到数据:" + new String(buffer.array()));
+				System.out.println("收到数据:" + new String(buffer.array()));
 	        	 
 	     		//回写数据
 	     		ByteBuffer outBuffer = ByteBuffer.wrap("收到\n".getBytes());

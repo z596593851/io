@@ -9,5 +9,8 @@
         <module name="io" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="io" target="1.7" />
+    </bytecodeTargetLevel>
   </component>
 </project>
