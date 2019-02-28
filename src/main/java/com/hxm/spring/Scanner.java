@@ -1,5 +1,6 @@
 package com.hxm.spring;
 
+import com.hxm.spring.annotion.SocketCmd;
 import com.hxm.spring.annotion.SocketModule;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.InitializingBean;
@@ -7,6 +8,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
 
+import java.lang.reflect.Method;
 import java.util.Map;
 
 /**
@@ -21,7 +23,30 @@ public class Scanner implements InitializingBean,ApplicationContextAware {
         Map<String,Object> beans=applicationContext.getBeansWithAnnotation(SocketModule.class);
         for (Map.Entry<String, Object> entry : beans.entrySet()) {
             Class<?>[]interfaces=entry.getValue().getClass().getInterfaces();
-            for(Class<?> interFace : interfaces)
+            for(Class<?> interFace : interfaces){
+                SocketModule socketModule=interFace.getAnnotation(SocketModule.class);
+                if(socketModule==null)
+                    continue;
+                Method[] methods=interFace.getMethods();
+                if(methods!=null&&methods.length>0)
+                    for(Method method:methods){
+                        SocketCmd socketCmd=method.getAnnotation(SocketCmd.class);
+                        if(socketCmd==null)
+                            continue;
+
+                        short module=socketModule.module();
+                        short cmd=socketCmd.cmd();
+                        Invoker invoker=Invoker.valueOf(entry.getValue(),method);
+                        if(InvokerHolder.getInvoker(module,cmd)==null)
+                            InvokerHolder.addInvoker(module,cmd,invoker);
+                        else
+                            System.out.println("重复注册执行器module:"+module+" cmd:"+cmd);
+                    }
+
+
+
+
+            }
 
         }
 

@@ -9,7 +9,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 public class main {
     public static void main(String[] args) {
         ApplicationContext applicationContext=new ClassPathXmlApplicationContext("classpath:applicationContext.xml");
-        Invoker invoker=InvokerHolder.getInvoker((short) 1,(short) 2);
+        Invoker invoker=InvokerHolder.getInvoker((short) 1,(short) 1);
         invoker.invoke(null);
 
     }
