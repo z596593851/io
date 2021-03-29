@@ -25,7 +25,8 @@ public class NoBlockClient {
         Selector selector = Selector.open();
 
         // 1.3将通道注册到选择器中，获取服务端返回的数据
-        socketChannel.register(selector, SelectionKey.OP_READ);
+//        SelectionKey key=socketChannel.register(selector, SelectionKey.OP_READ);
+        SelectionKey key=socketChannel.register(selector, SelectionKey.OP_CONNECT);
 
         // 2. 发送一张图片给服务端吧
         FileChannel fileChannel = FileChannel.open(Paths.get("1.jpg"), StandardOpenOption.READ);
@@ -34,18 +35,18 @@ public class NoBlockClient {
         ByteBuffer buffer = ByteBuffer.allocate(1024);
 
         // 4.读取本地文件(图片)，发送到服务器
-        while (fileChannel.read(buffer) != -1) {
-
-            // 在读之前都要切换成读模式
-            buffer.flip();
-
-            socketChannel.write(buffer);
-
-            // 读完切换成写模式，能让管道继续读取文件的数据
-            buffer.clear();
-        }
-//        fileChannel.close();
-//        socketChannel.close();
+//        while (fileChannel.read(buffer) != -1) {
+//
+//            // 在读之前都要切换成读模式
+//            buffer.flip();
+//
+//            socketChannel.write(buffer);
+//
+//            // 读完切换成写模式，能让管道继续读取文件的数据
+//            buffer.clear();
+//        }
+//        socketChannel.register(selector, SelectionKey.OP_WRITE);
+        key.interestOps(key.interestOps() | SelectionKey.OP_WRITE);
         // 5. 轮训地获取选择器上已“就绪”的事件--->只要select()>0，说明已就绪
         while (selector.select() > 0) {
             // 6. 获取当前选择器所有注册的“选择键”(已就绪的监听事件)
@@ -55,6 +56,10 @@ public class NoBlockClient {
             while (iterator.hasNext()) {
 
                 SelectionKey selectionKey = iterator.next();
+
+                if(selectionKey.isConnectable()){
+                    System.out.println("连接事件");
+                }
 
                 // 8. 读事件就绪
                 if (selectionKey.isReadable()) {
@@ -72,6 +77,9 @@ public class NoBlockClient {
                         responseBuffer.flip();
                         System.out.println(new String(responseBuffer.array(), 0, readBytes));
                     }
+                }
+                if (selectionKey.isWritable()) {
+                    System.out.println("可写");
                 }
 
                 // 10. 取消选择键(已经处理过的事件，就应该取消掉了)
